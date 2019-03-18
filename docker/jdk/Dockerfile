@@ -6,9 +6,12 @@ WORKDIR /root
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories && \
     apk update && \
-    apk add --no-cache tzdata bash
+    apk add --no-cache tzdata bash tini curl busybox-extras && \
+    curl -L https://alibaba.github.io/arthas/install.sh | sh && \
+    mv as.sh /usr/bin/as.sh
 
-ENV TZ=Asia/Shanghai \
-    JAVA_RAM="-XX:InitialRAMPercentage=60.0 -XX:MaxRAMPercentage=95.0"
+ENV TZ Asia/Shanghai
 
-ENTRYPOINT java ${JAVA_RAM} "-XshowSettings:vm" "-version"
+ENTRYPOINT ["/sbin/tini", "--"]
+
+CMD ["java", "-XX:InitialRAMPercentage=40.0", "-XX:MaxRAMPercentage=70.0", "-XshowSettings:vm", "-version"]
