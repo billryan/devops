@@ -1,12 +1,12 @@
 version: '3.2'
 services:
   kafka1:
-    image: wurstmeister/kafka:2.12-2.1.0
+    image: wurstmeister/kafka:2.12-2.2.1
     ports:
       - 9092:9092
     environment:
+      HOSTNAME_COMMAND: "docker info | grep 'Node Address'|cut -d' ' -f 4"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper_zoo1:2181,zookeeper_zoo2:2181,zookeeper_zoo3:2181/kafka-2.1
-      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9092
       KAFKA_LISTENERS: PLAINTEXT://:9092
     networks:
@@ -14,21 +14,33 @@ services:
     volumes:
       - kafka1:/kafka
   kafka2:
-    image: wurstmeister/kafka:2.12-2.1.0
+    image: wurstmeister/kafka:2.12-2.2.1
     ports:
       - 9093:9092
     environment:
+      HOSTNAME_COMMAND: "docker info | grep 'Node Address'|cut -d' ' -f 4"
       KAFKA_ZOOKEEPER_CONNECT: zookeeper_zoo1:2181,zookeeper_zoo2:2181,zookeeper_zoo3:2181/kafka-2.1
       # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9093
       KAFKA_LISTENERS: PLAINTEXT://:9092
-      # KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://_{HOSTNAME_COMMAND}:9094
-      # KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9094
-      # KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
     networks:
       - gateway
     volumes:
       - kafka2:/kafka
+  kafka3:
+    image: wurstmeister/kafka:2.12-2.2.1
+    ports:
+      - 9094:9092
+    environment:
+      HOSTNAME_COMMAND: "docker info | grep 'Node Address'|cut -d' ' -f 4"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper_zoo1:2181,zookeeper_zoo2:2181,zookeeper_zoo3:2181/kafka-2.1
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://_{HOSTNAME_COMMAND}:9094
+      KAFKA_LISTENERS: PLAINTEXT://:9092
+    networks:
+      - gateway
+    volumes:
+      - kafka3:/kafka
 
 networks:
   gateway:
